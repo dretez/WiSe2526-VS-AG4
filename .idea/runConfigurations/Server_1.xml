@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Server 1" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="de.haw.vs.termin4.server.Main" />
+    <module name="termin4" />
+    <option name="PROGRAM_PARAMETERS" value="8000" />
+    <option name="WORKING_DIRECTORY" value="$ProjectFileDir$" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

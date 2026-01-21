@@ -1,39 +1,52 @@
 package de.haw.vs.termin4.client;
 
-import de.haw.vs.termin4.common.network.Port;
+import de.haw.vs.termin4.client.exceptions.ServerCommunicationException;
+import de.haw.vs.termin4.client.exceptions.WriteException;
+import de.haw.vs.termin4.common.DataStore;
+import de.haw.vs.termin4.common.Logger;
 
-import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 
-public class Client {
-    private static final String DEFAULT_HOST = "127.0.0.1";
-
-    private final Socket clientSocket;
+public class Client implements DataStore {
+    private final List<DataStoreInterface> stores;
     private final String name;
 
-    public Client(String name, String host, int port) throws IOException {
-        this.clientSocket = new Socket(host, port);
+    public Client(List<Socket> sockets, String name) {
+        this.stores = new ArrayList<>(sockets.stream().map(DataStoreInterface::new).toList());
         this.name = name;
-    }
-
-    public Client(String name, String host) throws IOException {
-        this(name, host, Port.DEFAULT.port());
-    }
-
-    public Client(String name) throws IOException {
-        this(name, DEFAULT_HOST);
     }
 
     public String name() {
         return name;
     }
 
-    public Socket socket() {
-        return clientSocket;
+    @Override
+    public void write(int index, String data) {
+        for (var ds : stores)
+            try {
+                ds.write(index, data);
+            } catch (WriteException e) {
+                Logger.error(e.getMessage());
+            } catch (ServerCommunicationException _) {
+                stores.remove(ds);
+            }
     }
 
-    public void stop() throws IOException {
-        clientSocket.close();
+    @Override
+    public String read(int index) throws NoSuchElementException, ServerCommunicationException {
+        stores.addLast(stores.removeFirst());
+        try {
+            return stores.getFirst().read(index);
+        } catch (ServerCommunicationException _) {
+            stores.remove(stores.getFirst());
+            if (!stores.isEmpty())
+                return read(index);
+            else
+                throw new ServerCommunicationException("Could not reach any server, try to login again");
+        }
     }
 }
 

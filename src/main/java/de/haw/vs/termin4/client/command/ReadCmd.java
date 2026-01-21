@@ -1,32 +1,23 @@
 package de.haw.vs.termin4.client.command;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.haw.vs.termin4.client.Terminal;
-import de.haw.vs.termin4.common.Request;
-import de.haw.vs.termin4.common.json.JSON;
-import de.haw.vs.termin4.common.network.CommunicationInterface;
+import de.haw.vs.termin4.common.Logger;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 final class ReadCmd extends ClientCommand {
     @Override
-    protected void handle(List<String> args, Terminal terminal) throws IOException {
+    protected void handle(List<String> args, Terminal terminal) {
         if (args.size() != 2)
             throw new IllegalArgumentException("Expected use: read <index>");
-        ObjectNode builder = Request.READ.toObjectNode();
         try {
             int index = Integer.parseInt(args.get(1));
-            builder.put("index", index);
+            Logger.println(terminal.client().read(index));
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("<index> must be a numerical value", e);
+        } catch (NoSuchElementException e) {
+            throw new IllegalArgumentException(e);
         }
-        JsonNode json = JSON.parse(CommunicationInterface.sendAndAwait(terminal.client().socket(), JSON.toString(builder)));
-        if (!json.path("exception").isMissingNode())
-            throw new IOException(json.path("exception").asText() + ": " + json.path("message").asText());
-        if (json.path("data").isMissingNode())
-            throw new IOException("Missing expected \"data\" value, raw JSON:\n\t" + json);
-        System.out.println(json.path("data").asText());
     }
 }

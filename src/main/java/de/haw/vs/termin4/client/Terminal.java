@@ -3,7 +3,8 @@ package de.haw.vs.termin4.client;
 import de.haw.vs.termin4.client.command.ClientCommand;
 import de.haw.vs.termin4.common.Logger;
 
-import java.io.IOException;
+import java.net.Socket;
+import java.util.List;
 import java.util.Scanner;
 
 public class Terminal {
@@ -21,23 +22,17 @@ public class Terminal {
         return client;
     }
 
-    public static void start(String registryIP, int port) {
-        login(registryIP, port).terminalLoop();
+    public static void start(List<Socket> sockets) {
+        login(sockets).terminalLoop();
     }
 
-    private static Terminal login(String registryIP, int port) {
+    private static Terminal login(List<Socket> sockets) {
         Scanner sc = new Scanner(System.in);
         Logger.println("Please enter a user name");
-        while (true) {
-            Logger.print("> ");
-            String name = sc.nextLine().trim();
-            try {
-                Client client = new Client(name, registryIP, port);
-                return new Terminal(sc, client);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        Logger.print("> ");
+        String name = sc.nextLine().trim();
+        Client client = new Client(sockets, name);
+        return new Terminal(sc, client);
     }
 
     public void terminalLoop() {

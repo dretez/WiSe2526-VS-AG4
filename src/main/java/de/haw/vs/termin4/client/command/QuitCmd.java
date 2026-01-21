@@ -7,8 +7,7 @@ import java.util.List;
 
 final class QuitCmd extends ClientCommand {
     @Override
-    protected void handle(List<String> args, Terminal terminal) throws IOException {
-        terminal.client().stop();
+    protected void handle(List<String> args, Terminal terminal) {
         terminal.stop();
     }
 }

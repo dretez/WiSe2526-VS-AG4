@@ -20,7 +20,7 @@ public abstract sealed class ClientCommand permits HelpCmd, QuitCmd, ReadCmd, Wr
             };
             handler.handle(argList, terminal);
         } catch (Exception e) {
-            Logger.error(e.getMessage());
+            Logger.error(e.getClass().getSimpleName() +  ": " + e.getMessage());
         }
     }
 
