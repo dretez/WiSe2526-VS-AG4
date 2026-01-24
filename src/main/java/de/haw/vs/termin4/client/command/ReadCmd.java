@@ -13,7 +13,11 @@ final class ReadCmd extends ClientCommand {
             throw new IllegalArgumentException("Expected use: read <index>");
         try {
             int index = Integer.parseInt(args.get(1));
-            Logger.println(terminal.client().read(index));
+            long startTime = System.nanoTime();
+            String data = terminal.client().read(index);
+            long endTime = System.nanoTime();
+            Logger.println(data);
+            Logger.println("Read call took: " + ((endTime - startTime) / 10e6) + " ms");
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("<index> must be a numerical value", e);
         } catch (NoSuchElementException e) {
