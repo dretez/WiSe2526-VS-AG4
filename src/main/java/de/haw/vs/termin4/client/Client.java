@@ -12,34 +12,35 @@ import java.util.NoSuchElementException;
 
 public class Client implements DataStore {
     private final List<DataStoreInterface> stores;
-    private final String name;
 
-    public Client(List<Socket> sockets, String name) {
+    public Client(List<Socket> sockets) {
         this.stores = new ArrayList<>(sockets.stream().map(DataStoreInterface::new).toList());
-        this.name = name;
-    }
-
-    public String name() {
-        return name;
     }
 
     @Override
-    public void write(int index, String data) {
+    public void write(int index, String data) throws ServerCommunicationException {
+        List<DataStoreInterface> stale = new ArrayList<>();
         for (var ds : stores)
             try {
                 ds.write(index, data);
             } catch (WriteException e) {
                 Logger.error(e.getMessage());
             } catch (ServerCommunicationException _) {
-                stores.remove(ds);
+                stale.add(ds);
             }
+        stores.removeAll(stale);
+        if (stores.isEmpty())
+            throw new ServerCommunicationException("Could not reach any server, try to login again");
     }
 
     @Override
     public String read(int index) throws NoSuchElementException, ServerCommunicationException {
-        stores.addLast(stores.removeFirst());
+        if (stores.isEmpty())
+            throw new ServerCommunicationException("Could not reach any server, try to login again");
         try {
-            return stores.getFirst().read(index);
+            String data = stores.getFirst().read(index);
+            stores.addLast(stores.removeFirst());
+            return data;
         } catch (ServerCommunicationException _) {
             stores.remove(stores.getFirst());
             if (!stores.isEmpty())

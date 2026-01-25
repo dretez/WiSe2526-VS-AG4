@@ -28,10 +28,7 @@ public class Terminal {
 
     private static Terminal login(List<Socket> sockets) {
         Scanner sc = new Scanner(System.in);
-        Logger.println("Please enter a user name");
-        Logger.print("> ");
-        String name = sc.nextLine().trim();
-        Client client = new Client(sockets, name);
+        Client client = new Client(sockets);
         return new Terminal(sc, client);
     }
 
@@ -45,7 +42,7 @@ public class Terminal {
     }
 
     private void welcome() {
-        Logger.println("Welcome " + client.name());
+        Logger.println("Welcome");
         Logger.println("Use help to get a list of available commands");
     }
 
