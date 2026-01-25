@@ -1,11 +1,9 @@
 package de.haw.vs.termin4.common;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.haw.vs.termin4.common.json.JSON;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 public enum Request {

@@ -3,7 +3,6 @@ package de.haw.vs.termin4.client.command;
 import de.haw.vs.termin4.client.Terminal;
 import de.haw.vs.termin4.common.Logger;
 
-import java.io.IOException;
 import java.util.List;
 
 final class WriteCmd extends ClientCommand {
